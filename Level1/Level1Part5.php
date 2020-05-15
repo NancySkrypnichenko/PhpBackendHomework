@@ -24,7 +24,7 @@ $contents = readHttpLikeInput();
  * the method divides the HTTP request in the form of a string into structural fragments
  * and returns an array with the corresponding values
  *
- * @param $string HTTP request
+ * @param $string : HTTP request
  * @return string[] array with Parsed HTTP request
  */
 function parseTcpStringAsHttpRequest($string)
@@ -76,32 +76,37 @@ $HttpRequest = parseTcpStringAsHttpRequest($contents);
  */
 function processHttpRequest($method, $uri, $headers, $body)
 {
-    $answerHeaders = "Server: Apache/2.2.14 (Win32)
-Content-Length: size
-Connection: Closed
-Content-Type: text/html; charset=utf-8";
+    $filename = findHeaderHostAddress($headers) . findAddressFromUri($uri);
+    $bodyAnswer = file_get_contents($filename);
 
-    if ($method == "GET") {
-        $indexOfSum = strpos($uri, "/sum");
+    return ($bodyAnswer === FALSE) ? answerGenerator(404, "Not Found", "not found") :
+        answerGenerator(200, "OK", "$bodyAnswer");
+}
 
-        if ($indexOfSum === FALSE) {
-            return answerGenerator(404, "Not Found", $answerHeaders, "not found");
+/**
+ * @param $headers : host header content
+ * @return mixed|string - address from host header content ore "" if it is empty
+ */
+function findHeaderHostAddress($headers)
+{
+    for ($i = 0; i < count($headers); $i++) {
+        if ($headers[i][0] === "Host") {
+            $hostAddress = explode(".", $headers[i][1], 2);
+            return ($hostAddress[0] === "student" || $hostAddress[0] === "another") ? $hostAddress[0] . "/" : "else/";
         }
-
-        $indexOfNums = strpos($uri, "?nums");
-
-        if ($indexOfNums === FALSE) {
-            return answerGenerator(400, "Bad Request", $answerHeaders, "bad request");
-        }
-        $partOfUri = explode("=", $uri);
-        $numbersFromUri = explode(",", $partOfUri[1]);
-        $result = 0;
-        foreach ($numbersFromUri as $value) {
-            $result += (int)$value;
-        }
-        return answerGenerator(200, "OK", $answerHeaders, strval($result));
     }
-    return answerGenerator(400, "Bad Request", $answerHeaders, "bad request");
+    return "";
+}
+
+/**
+ *the method extracts the address from uri for subsequent access
+ *
+ * @param $uri : corresponding HTTP request fragment
+ * @return false|string address from uri? if it present, or "index.html"
+ */
+function findAddressFromUri($uri)
+{
+    return ($uri === "/") ? "index.html" : substr($uri, 1);
 }
 
 /**
@@ -109,13 +114,16 @@ Content-Type: text/html; charset=utf-8";
  *
  * @param $statuscode : sequence of numbers of status
  * @param $statusmessage : massage of status
- * @param $headers : headers in answer
  * @param $body : massage of status in lover case
  * @return string : generated HTTP response
  */
-function answerGenerator($statuscode, $statusmessage, $headers, $body)
+function answerGenerator($statuscode, $statusmessage, $body)
 {
-    return "HTTP/1.1 " . $statuscode . " " . $statusmessage . "\n" . str_replace("size", strval(strlen($body)), $headers) . "\n\n" . $body;
+    $answerHeaders = "Server: Apache/2.2.14 (Win32)
+Content-Length: size
+Connection: Closed
+Content-Type: text/html; charset=utf-8";
+    return "HTTP/1.1 " . $statuscode . " " . $statusmessage . "\n" . str_replace("size", strval(strlen($body)), $answerHeaders . "\n\n" . $body);
 }
 
 $http = processHttpRequest($HttpRequest["method"], $HttpRequest["uri"], $HttpRequest["headers"], $HttpRequest["body"]);

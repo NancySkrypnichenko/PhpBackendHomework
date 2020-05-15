@@ -1,6 +1,4 @@
 <?php
-
-
 if (count($argv) != 3) {
     die("usage: php tester.php <tasknum> <path/to/task.php>\nexample: php tester.php 1 t1.php\n");
 }

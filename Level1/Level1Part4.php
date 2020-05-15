@@ -1,6 +1,6 @@
 <?php
 
-
+//function for reading input correctly
 function readHttpLikeInput()
 {
     $f = fopen('php://stdin', 'r');
@@ -21,15 +21,19 @@ function readHttpLikeInput()
 $contents = readHttpLikeInput();
 
 
+/**
+ * the method divides the HTTP request in the form of a string into structural fragments
+ * and returns an array with the corresponding values
+ *
+ * @param $string HTTP request
+ * @return string[] array with Parsed HTTP request
+ */
 function parseTcpStringAsHttpRequest($string)
 {
     // find empty string to find body, if it present
     $pieces = explode("\n\n", $string);
 
-// find length of new array. if length == 1 - body is apsend, if length == 2 - body is present, else - it is error
-    $length = count($pieces);
-
-// in my mint it need if some bloks are upsend. Field will stay empty
+    // it need to correct order of element in the result
     $answer = array(
         "method" => "",
         "uri" => "",
@@ -37,46 +41,54 @@ function parseTcpStringAsHttpRequest($string)
         "body" => "",
     );
 
-    if ($length == 2) {
+    if (count($pieces) === 2) {
         $answer ["body"] = $pieces [1];
-    }
-
-    if ($length == 3) {
-        echo "\n";
-        echo "something is wrong";
     }
 
     //for future work substring should be splited by the \n
     $partWithoutBody = explode("\n", $pieces [0]);
 
-    //work whis first row
+    //work with first row
     $firstRow = explode(" ", $partWithoutBody [0]);
     $answer["method"] = $firstRow [0];
     $answer["uri"] = $firstRow [1];
 
-    // next shoul work whis headers, its 1, 2... element in $partWithoutBody
+    // next should work wits headers, its 1, 2... element in $partWithoutBody
     $headers = array();
-    $countHeaders = count($partWithoutBody);
 
-    for ($i = 1; $i < $countHeaders; $i++) {
-        $oneHeader = explode(": ", $partWithoutBody [$i]);
-        $headers[] = $oneHeader;
+    for ($i = 1; $i < count($partWithoutBody); $i++) {
+        $headers[] = explode(": ", $partWithoutBody [$i]);
     }
-
     $answer ["headers"] = $headers;
+
     return $answer;
 }
 
 $HttpRequest = parseTcpStringAsHttpRequest($contents);
 
+/**
+ * the method generates an http response depending on the incoming parameters (request)
+ *
+ * @param $method : of the HTTP request
+ * @param $uri : of the HTTP request
+ * @param $headers : of the HTTP request
+ * @param $body : request body content
+ * @return string http response
+ */
 function processHttpRequest($method, $uri, $headers, $body)
 {
     $answerHeaders = "Server: Apache/2.2.14 (Win32)
 Content-Length: size
 Connection: Closed
 Content-Type: text/html; charset=utf-8";
+    $correctContentType = FALSE;
+    for ($i = 0; $i < count($headers); $i++) {
+        if ($headers[$i][0] === "Content-Type" && $headers[$i][1] === "application/x-www-form-urlencoded") {
+            $correctContentType = TRUE;
+        }
+    }
 
-    if ($method === "POST" && $uri === "/api/checkLoginAndPassword") {
+    if ($method === "POST" && $uri === "/api/checkLoginAndPassword" && $correctContentType) {
         $loginAndPassvord = explode("&", $body);
         $login = explode("=", $loginAndPassvord[0]);
         $passvord = explode("=", $loginAndPassvord[1]);
@@ -94,6 +106,15 @@ Content-Type: text/html; charset=utf-8";
     return answerGenerator(400, "Bad Request", $answerHeaders, "bad request");
 }
 
+/**
+ * the method makes a ready line - the HTTP answer
+ *
+ * @param $statuscode : sequence of numbers of status
+ * @param $statusmessage : massage of status
+ * @param $headers : headers in answer
+ * @param $body : massage of status in lover case
+ * @return string : generated HTTP response
+ */
 function answerGenerator($statuscode, $statusmessage, $headers, $body)
 {
     return "HTTP/1.1 " . $statuscode . " " . $statusmessage . "\n" . str_replace("size", strval(strlen($body)), $headers) . "\n\n" . $body;

@@ -181,9 +181,13 @@ T4
 ,
     5 => <<<T5
 {
-    "method": "GET ",
+    "method": "GET",
     "uri": "\/",
     "headers": [
+        [
+            "Host",
+            "student.shpp.me"
+        ],
         [
             "Accept",
             "image\/gif, image\/jpeg, *\/*"
@@ -199,10 +203,6 @@ T4
         [
             "User-Agent",
             "Mozilla\/4.5"
-        ],
-        [
-            "Content-Length",
-            "35"
         ]
     ],
     "body": ""
@@ -239,7 +239,7 @@ for ($i = 1; $i < 6; $i++) {
 
         $answers[$i] = preg_replace("/\r/", "", $answers[$i]);
         if ($c2 == $answers[$i]) {
-            echo "response is correct :)";
+            echo "\n response is correct :) \n";
         } else {
             echo "-----CORRECT-RESPONSE-BEGIN--------------------\n";
             echo "(" . $answers[$i] . ")\n";
