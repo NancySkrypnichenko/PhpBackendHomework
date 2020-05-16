@@ -77,10 +77,6 @@ $HttpRequest = parseTcpStringAsHttpRequest($contents);
  */
 function processHttpRequest($method, $uri, $headers, $body)
 {
-    $answerHeaders = "Server: Apache/2.2.14 (Win32)
-Content-Length: size
-Connection: Closed
-Content-Type: text/html; charset=utf-8";
     $correctContentType = FALSE;
     for ($i = 0; $i < count($headers); $i++) {
         if ($headers[$i][0] === "Content-Type" && $headers[$i][1] === "application/x-www-form-urlencoded") {
@@ -95,15 +91,15 @@ Content-Type: text/html; charset=utf-8";
 
         $arhive = file("passwords.txt", FILE_SKIP_EMPTY_LINES);
         if ($arhive === FALSE) {
-            return answerGenerator(200, "OK", $answerHeaders, "<h1 style=\"color:green\">FOUND</h1>");
+            return answerGenerator(404, "Not Found", "not found");
         }
 
         if (in_array($login[1] . ":" . $passvord[1], $arhive)) {
-            return answerGenerator(500, "Internal Server Error", $answerHeaders, "internal server error");
+            return answerGenerator(200, "OK", "<h1 style=\"color:green\">FOUND</h1>");
         }
-        return answerGenerator(403, "Forbidden", $answerHeaders, "forbidden");
+        return answerGenerator(403, "Forbidden", "forbidden");
     }
-    return answerGenerator(400, "Bad Request", $answerHeaders, "bad request");
+    return answerGenerator(400, "Bad Request", "bad request");
 }
 
 /**
@@ -111,13 +107,16 @@ Content-Type: text/html; charset=utf-8";
  *
  * @param $statuscode : sequence of numbers of status
  * @param $statusmessage : massage of status
- * @param $headers : headers in answer
  * @param $body : massage of status in lover case
  * @return string : generated HTTP response
  */
-function answerGenerator($statuscode, $statusmessage, $headers, $body)
+function answerGenerator($statuscode, $statusmessage, $body)
 {
-    return "HTTP/1.1 " . $statuscode . " " . $statusmessage . "\n" . str_replace("size", strval(strlen($body)), $headers) . "\n\n" . $body;
+    $answerHeaders = "Server: Apache/2.2.14 (Win32)
+Content-Length: size
+Connection: Closed
+Content-Type: text/html; charset=utf-8";
+    return "HTTP/1.1 " . $statuscode . " " . $statusmessage . "\n" . str_replace("size", strval(strlen($body)), $answerHeaders) . "\n\n" . $body;
 }
 
 $http = processHttpRequest($HttpRequest["method"], $HttpRequest["uri"], $HttpRequest["headers"], $HttpRequest["body"]);

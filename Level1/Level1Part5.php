@@ -1,4 +1,5 @@
 <?php
+//it is only theory, still cant test it
 
 //function for reading input correctly
 function readHttpLikeInput()
@@ -77,10 +78,9 @@ $HttpRequest = parseTcpStringAsHttpRequest($contents);
 function processHttpRequest($method, $uri, $headers, $body)
 {
     $filename = findHeaderHostAddress($headers) . findAddressFromUri($uri);
-    $bodyAnswer = file_get_contents($filename);
 
-    return ($bodyAnswer === FALSE) ? answerGenerator(404, "Not Found", "not found") :
-        answerGenerator(200, "OK", "$bodyAnswer");
+    return (file_exists($filename) ? answerGenerator(200, "OK", file_get_contents($filename)) :
+        answerGenerator(404, "Not Found", "not found"));
 }
 
 /**
