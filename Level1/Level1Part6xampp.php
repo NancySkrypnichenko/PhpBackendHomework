@@ -15,5 +15,6 @@ if (file_exists($file_name)) {
 } else {
     $count = 0;
 }
-file_put_contents($file_name, $count + 1);
-echo $count;
+echo $count++;
+file_put_contents($file_name, $count);
+

@@ -89,9 +89,9 @@ function processHttpRequest($method, $uri, $headers, $body)
  */
 function findHeaderHostAddress($headers)
 {
-    for ($i = 0; i < count($headers); $i++) {
-        if ($headers[i][0] === "Host") {
-            $hostAddress = explode(".", $headers[i][1], 2);
+    for ($i = 0; $i < count($headers); $i++) {
+        if ($headers[$i][0] === "Host") {
+            $hostAddress = explode(".", $headers[$i][1], 2);
             return ($hostAddress[0] === "student" || $hostAddress[0] === "another") ? $hostAddress[0] . "/" : "else/";
         }
     }
