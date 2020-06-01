@@ -1,6 +1,7 @@
 <?php
 require_once 'headers.php';
 require_once 'connect.php';
+require_once 'service.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     //get information from input json

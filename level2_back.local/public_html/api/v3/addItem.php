@@ -1,8 +1,10 @@
 <?php
 require_once 'headers.php';
 require_once 'connect.php';
+require_once 'service.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    session_start();
 
     //if session is not exist should report about error
     if (!session_name()) {
@@ -10,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $sql = 'INSERT INTO ToDo (user_id, text, checked) VALUES (:userId, :newText, :checked)';
 
-    $userId = (int)$_SESSION['user']['id'];
+    $userId = $_SESSION['user']['id'];
 
     //form new task to put it to database
     $json = json_decode(file_get_contents("php://input"));

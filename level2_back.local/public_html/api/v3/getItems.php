@@ -3,6 +3,7 @@ session_start();
 
 require_once 'headers.php';
 require_once 'connect.php';
+require_once 'service.php';
 
 $login = (int)$_SESSION['user']['id'];
 $json = array('items' => []);
