@@ -5,47 +5,54 @@ require_once '../config/constants.php';
 
 // Подключаемся к базе данных
 function connectDB() {
-    $errorMessage = 'Невозможно подключиться к серверу базы данных';
-    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
-    if (!$conn)
-        throw new Exception($errorMessage);//TODO do it correctly!!
-    else {
-        $query = $conn->query('set names utf8');
-        if (!$query)
-            throw new Exception($errorMessage);
-        else
-            return $conn;
+    $db_connect= null;
+    try{
+    $db_connect = new PDO('mysql:host=localhost;dbname=library_base;charset=utf8', DB_USER, DB_PASSWORD);
+    $db_connect->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch (PDOException $e) {
+        echo json_encode(array("error" => $e->getMessage()));
     }
+    return $db_connect;
 }
 
 
 // Получаем список файлов для миграций
-function getMigrationFiles($conn) {
+function getMigrationFiles($db_connect) {
     // Находим папку с миграциями
     $sqlFolder = str_replace('\\', '/', realpath(dirname(__FILE__)) . '/');
     // Получаем список всех sql-файлов
     $allFiles = glob($sqlFolder . '*.sql');
 
+    print_r($allFiles);
+
     // Проверяем, есть ли таблица versions
     // Так как versions создается первой, то это равносильно тому, что база не пустая
     $query = sprintf('show tables from `%s` like "%s"', DB_NAME, DB_TABLE_VERSIONS);
-    $data = $conn->query($query);
-    $firstMigration = !$data->num_rows;
+    $statement = $db_connect->prepare($query);
+    $statement->execute();
 
-    // Первая миграция, возвращаем все файлы из папки sql
-    if ($firstMigration) {
+    //Fetch the rows from our statement
+    $tables = $statement->fetchAll(PDO::FETCH_NUM);
+
+    // Если первая миграция, возвращаются все файлы из папки sql
+    if (!$tables) {
         return $allFiles;
     }
 
     // Ищем уже существующие миграции
     $versionsFiles = array();
+
     // Выбираем из таблицы versions все названия файлов
     $query = sprintf('select `name` from `%s`', DB_TABLE_VERSIONS);
-    $data = $conn->query($query)->fetch_all(MYSQLI_ASSOC);
+    $statement = $db_connect->prepare($query);
+    $statement->execute();
+    $tables = $statement->fetchAll(PDO::FETCH_NUM);
+
     // Загоняем названия в массив $versionsFiles
     // Не забываем добавлять полный путь к файлу
-    foreach ($data as $row) {
-        array_push($versionsFiles, $sqlFolder . $row['name']);
+
+    for ($i=0; $i < count ($tables); $i++){
+        array_push($versionsFiles, $sqlFolder . $tables[$i][0]);
     }
 
     // Возвращаем файлы, которых еще нет в таблице versions
@@ -53,7 +60,7 @@ function getMigrationFiles($conn) {
 }
 
 // Накатываем миграцию файла
-function migrate($conn, $file) {
+function migrate($db_connect, $file) {
     // Формируем команду выполнения mysql-запроса из внешнего файла
     $command = sprintf('mysql -u%s -p%s -h %s -D %s < %s', DB_USER, DB_PASSWORD, DB_HOST, DB_NAME, $file);
     // Выполняем shell-скрипт
@@ -64,17 +71,18 @@ function migrate($conn, $file) {
     // Формируем запрос для добавления миграции в таблицу versions
     $query = sprintf('insert into `%s` (`name`) values("%s")', DB_TABLE_VERSIONS, $baseName);
     // Выполняем запрос
-    $conn->query($query);
+    $statement = $db_connect->prepare($query);
+    $statement->execute();
 }
 
 
 // Стартуем
 
 // Подключаемся к базе
-$conn = connectDB();
+$db_connect = connectDB();
 
 // Получаем список файлов для миграций за исключением тех, которые уже есть в таблице versions
-$files = getMigrationFiles($conn);
+$files = getMigrationFiles($db_connect);
 
 // Проверяем, есть ли новые миграции
 if (empty($files)) {
@@ -84,7 +92,7 @@ if (empty($files)) {
 
     // Накатываем миграцию для каждого файла
     foreach ($files as $file) {
-        migrate($conn, $file);
+        migrate($db_connect, $file);
         // Выводим название выполненного файла
         echo basename($file) . '<br>';
     }
