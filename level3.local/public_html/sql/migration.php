@@ -63,7 +63,7 @@ function migrate($db_connect, $file) {
 // Стартуем
 
 // Подключаемся к базе
-$db_connect = connectDB();
+$db_connect = ConnectBD::connectDB();
 
 // Получаем список файлов для миграций за исключением тех, которые уже есть в таблице versions
 $files = getMigrationFiles($db_connect);

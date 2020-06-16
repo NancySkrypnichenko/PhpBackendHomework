@@ -15,16 +15,15 @@ create table if not exists `versions`
 -- Table books --
 create table if not exists `books`
 (
-    `id`              serial       not null,
-    `book_name`       varchar(255) not null,
-    `year`            int(4),
-    `picture`         varchar(255),
-    `author_name`     varchar(255) not null,
-    `number_of_clicks` INT(11) UNSIGNED DEFAULT 0
+    `id`               serial       not null,
+    `book_name`        varchar(255) not null,
+    `year`             int(4),
+    `picture`          varchar(255),
+    `author_name`      varchar(255) not null,
+    `number_of_clicks` INT(11) UNSIGNED DEFAULT 0,
+    `is_active`        INT(1) UNSIGNED  DEFAULT 1
 )
-
-
-#     `author_id`   BIGINT UNSIGNED NOT NULL,
+    #     `author_id`   BIGINT UNSIGNED NOT NULL,
 #         FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`)
 #         ON DELETE RESTRICT ON UPDATE CASCADE
 
