@@ -2,28 +2,24 @@
 include_once  ROOT. '/models/Books.php';
 
 class BooksController
-{
-    public function actionIndex()// просмотр списка книг
-    {
-        $booksList = array();
-        $booksList = Books::getBooksList();
-        require_once ROOT. '/views/books/books-page.html';
-//        echo '<pre>';
-//        print_r($booksList);
-//        echo '<pre>';
 
+{
+
+
+    public function actionIndex($shift)// просмотр списка книг
+    {
+        $booksList = Books::getBooksList($shift);
+        include_once ROOT . '/views/books/index.php';
         return true;
     }
+
     public function actionView($id)// просмотр одной книги.
     {
-        if ($id){
+        if ($id) {
             $book = Books::getBookById($id);
+            include_once ROOT . '/views/OneBook/index.php';
         }
-        echo '<pre>';
-        print_r($book);
-        echo '<pre>';
 
-        echo 'actionView';
         return true;
     }
 }

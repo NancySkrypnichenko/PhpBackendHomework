@@ -30,10 +30,10 @@ class Router
         foreach ($this->routes as $uriPattern => $path) {
 
             //compare $uriPattern with $uri
-            if (preg_match("~$uriPattern~", $uri)) {
+            if (preg_match("~^$uriPattern~", $uri)) {
 
                 // получаем внутренний путь из внешнего согласно правилу
-                $internalRoute = preg_replace("~$uriPattern~", $path, $uri);
+                $internalRoute = preg_replace("~^$uriPattern~", $path, $uri);
 
                 $segments = explode('/', $internalRoute);
 
@@ -53,7 +53,7 @@ class Router
                 //create object, call method (action)
                 $controllerObject = new $controllerName;
 
-                $result = call_user_func_array(array ($controllerObject,$actionName), $parameters);
+                $result = call_user_func_array(array($controllerObject, $actionName), $parameters);
                 if ($result != null) {
                     break;
                 }
