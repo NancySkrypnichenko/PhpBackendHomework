@@ -34,8 +34,52 @@
 <section id="header" class="header-wrapper">
 
     <div class="logout">
-        <a href="http://level3.local/logout/" style="margin-right: 200px; margin-top: 20px; margin-block: 20px;"
-           type="button" class="page-link pull-right">Выход</a>
+        <button style="margin-right: 200px; margin-top: 20px; margin-block: 20px;"
+                type="button" id="logout" onclick="ClearAuthentication('/books')" class="page-link pull-right">Выход
+        </button>
+
+        <script>
+            function ClearAuthentication(LogOffPage) {
+                console.log("nhfkbdfkb");
+                var IsInternetExplorer = false;
+                admin = 'n';
+                try {
+                    var agt = navigator.userAgent.toLowerCase();
+                    if (agt.indexOf("msie") != -1) {
+                        IsInternetExplorer = true;
+                    }
+                } catch (e) {
+                    IsInternetExplorer = false;
+                }
+                ;
+
+                if (IsInternetExplorer) {
+                    // Logoff Internet Explorer
+                    document.execCommand("ClearAuthenticationCache");
+                    window.location = LogOffPage;
+                } else {
+                    // Logoff every other browsers
+                    $.ajax({
+                        username: 'unknown',
+                        password: 'WrongPassword',
+                        url: '/adm/form',
+                        type: 'GET',
+                        headers: {"Authorization": "Basic xxx"},
+                        /*beforeSend: function(xhr)
+                        {
+                            xhr.setRequestHeader("Authorization", "Basic AAAAAAAAAAAAAAAAAAA=");
+                        },*/
+
+                        error: function (err) {
+                            //alert(window.location.protocol + '//xxxx:xxxx@' + window.location.host + ':' + window.location.port + LogOffPage);
+                            window.location = window.location.protocol + '//xxxx:xxxx@' + window.location.host + LogOffPage;
+                            window.location = window.location.protocol + '//' + window.location.host + LogOffPage;
+                        }
+                    });
+                }
+            }
+        </script>
+
     </div>
 
 </section>
@@ -98,12 +142,6 @@
                 <center>
         </td>
 
-        <!-- в style.css нужно добавить вот это. Остальное регулирует себя само, по крайней мере
-        у меня это таки выглядит прилично
-
-        .row{
-        margin: 20px;
-        } -->
 
         <td width="2%"></td>
         <td valign="top" width="25%" bgcolor="#f0f0f0">
@@ -161,10 +199,9 @@
     </tr>
 </table>
 
-
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
-<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"
+        integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
         crossorigin="anonymous"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
         integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
