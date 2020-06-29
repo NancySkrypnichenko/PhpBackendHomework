@@ -2,6 +2,13 @@
 <html lang="ru">
 
 <head>
+    <script
+            src="https://code.jquery.com/jquery-3.5.1.min.js"
+            integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0="
+            crossorigin="anonymous">
+
+    </script>
+
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>shpp-library</title>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -99,7 +106,30 @@
                         </div>
                     </div>
                     <div class="btnBlock col-xs-12 col-sm-12 col-md-12">
-                        <button type="button" class="btnBookID btn-lg btn btn-success">Хочу читать!</button>
+                        <button type="button" id="WantRead" class="btnBookID btn-lg btn btn-success">Хочу читать!
+                        </button>
+
+                        <script>
+                            $(document).ready(function () {
+                                $('button#WantRead').on('click', function () {
+                                    $.ajax({
+                                        method: "GET",
+                                        url: "want/<?php echo $book['id'] ?>"
+                                    })
+                                        .done(function (msg) {
+                                            alert(
+                                                "Книга свободна и ты можешь прийти за ней." +
+                                                " Наш адрес: г. Кропивницкий, переулок Васильевский 10, 5 этаж." +
+                                                " Лучше предварительно прозвонить и предупредить нас, чтоб " +
+                                                " не попасть в неловкую ситуацию. Тел. 099 196 24 69" +
+                                                " \n\n" +
+                                                "******************\n"
+                                            );
+                                        });
+                                });
+
+                            });
+                        </script>
                     </div>
                     <div class="bookDescription col-xs-12 col-sm-12 col-md-12 hidden-xs hidden-sm">
                         <h4>О книге</h4>
