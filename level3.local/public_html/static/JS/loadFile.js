@@ -21,7 +21,7 @@ function addFile(event) {
             if (data.status == 'ok') {
                 message.html("Файл загружен<br>" +
                     "<img src='../../static/PreFiles/" + data.fileName + "'>" +
-                    "<input type='hidden' name='uploadedPicture' value='" + data.fileName + "'>")
+                    "<input type='hidden' name='uploadedPicture' value='../../static/PreFiles/" + data.fileName + "'>")
 
             } else {
                 message.text("Что- то пошло не так");
