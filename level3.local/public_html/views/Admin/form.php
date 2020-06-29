@@ -17,6 +17,8 @@
     <link rel="stylesheet" href="../../static/CSS/libs.min.css">
     <link rel="stylesheet" href="../../static/CSS/style.css">
 
+    <script type="text/javascript" src="../../static/JS/loadFile.js"></script>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
           crossorigin="anonymous"/>
@@ -40,7 +42,8 @@
 
         <script>
             function ClearAuthentication(LogOffPage) {
-                console.log("nhfkbdfkb");
+
+                const url = new URL("http://level3.local/adm/form");
                 var IsInternetExplorer = false;
                 admin = 'n';
                 try {
@@ -57,6 +60,10 @@
                     // Logoff Internet Explorer
                     document.execCommand("ClearAuthenticationCache");
                     window.location = LogOffPage;
+                } else if (/firefox|iceweasel|fxios/i.test(window.navigator.userAgent)) {
+                    url.username = 'none';
+                    url.password = 'none';
+                    window.location.assign(url);
                 } else {
                     // Logoff every other browsers
                     $.ajax({
@@ -166,14 +173,10 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <div class="input-group mb-3">
-                                <input type="text" name="picture" class="form-control" id="user" style="width: 200px;"
-                                       placeholder="Загрузите изображение"
-                                       aria-label="Recipient's username" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                    <button class="btn btn-outline-secondary" type="button">Button</button>
-                                </div>
-                            </div>
+
+                            <input type='file' name="picture" id="picture" onchange="addFile()">
+                            <div id="load"></div>
+
                         </div>
                         <div class="col">
                             <input type="text" name="author_3" class="form-control" placeholder="автор 3">
@@ -181,8 +184,7 @@
                     </div>
                     <div class="row">
                         <div class="col">
-                            <!-- а вот этого тут не должно быть... тут превью картинки  -->
-                            <input type="text" class="form-control" placeholder="Имя">
+
                         </div>
                         <div class="col">
                             <p><textarea name="comment" style="width: 200px;" id="comment"></textarea></p>
