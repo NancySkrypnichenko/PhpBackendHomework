@@ -128,4 +128,39 @@ class Book
         }
         return true;
     }
+
+
+    public static function search($string)
+    {
+        try {
+
+            $db_connect = ConnectBD::connectDB();
+            $query = $db_connect->prepare("SELECT * from books where book_name  LIKE :string or author_name LIKE :string;");
+            $string = '%' . urldecode($string) . '%';
+
+            echo $string;
+
+            $query->bindValue(":string", $string, PDO::PARAM_STR);
+            $query->execute();
+            $count = $query->rowCount();
+
+            $books_list = array();
+            for ($i = 0; $row = $query->fetch(); $i++) {
+                $books_list[$i]['id'] = $row['id'];
+                $books_list[$i]['book_name'] = $row['book_name'];
+                $books_list[$i]['year'] = $row['year'];
+                $books_list[$i]['picture'] = $row['picture'];
+                $books_list[$i]['author_name'] = $row['author_name'];
+                $books_list[$i]['number_of_clicks'] = $row['number_of_clicks'];
+                $books_list[$i]['shift'] = 0;
+                $books_list[$i]['count'] = $count;
+
+            }
+            return $books_list;
+
+        } catch (PDOException $e) {
+            echo json_encode(array("error" => $e->getMessage()));
+        }
+        return true;
+    }
 }
