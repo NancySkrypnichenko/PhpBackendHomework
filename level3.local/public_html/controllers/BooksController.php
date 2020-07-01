@@ -1,5 +1,5 @@
 <?php
-include_once  ROOT. '/models/Books.php';
+include_once ROOT . '/models/Book.php';
 
 class BooksController
 
@@ -8,7 +8,8 @@ class BooksController
 
     public function actionIndex($shift)// просмотр списка книг
     {
-        $booksList = Books::getBooksList($shift);
+
+        $booksList = Book::getBooksList($shift);
         include_once ROOT . '/views/books/index.php';
         return true;
     }
@@ -16,10 +17,23 @@ class BooksController
     public function actionView($id)// просмотр одной книги.
     {
         if ($id) {
-            $book = Books::getBookById($id);
+            $book = Book::getBookById($id);
             include_once ROOT . '/views/OneBook/index.php';
         }
 
+        return true;
+    }
+
+    public function actionStatistic($id)
+    {
+        $book = Book::increaseNumberOfBookRequest($id);
+    }
+
+    public function actionSearch($string)
+    {
+
+        $booksList = Book::search($string);
+        include_once ROOT . '/views/books/index.php';
         return true;
     }
 }
