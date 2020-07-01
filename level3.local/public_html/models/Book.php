@@ -76,20 +76,20 @@ class Book
     {
         try {
             //соединение с БД
-            print_r($array_from_post_request);
+            $new_picture_path = "../../static/Images/" . $array_from_post_request['uploadedPicture'];
+            move_uploaded_file("../../static/PreFiles/" . $array_from_post_request['uploadedPicture'], $new_picture_path);
 
             $db_connect = ConnectBD::connectDB();
             $query = 'INSERT INTO books (book_name, year, picture, author_name) VALUES (:book_name, :year, :picture, :author_name)';
 
             $book_name = $array_from_post_request['book_name'];
             $year = $array_from_post_request['year'];
-            $picture = $array_from_post_request['uploadedPicture'];
             $author_name = $array_from_post_request['author_1'];
 
             $data = $db_connect->prepare($query);
             $data->bindParam(":book_name", $book_name, PDO::PARAM_STR);
             $data->bindParam(":year", $year, PDO::PARAM_INT);
-            $data->bindParam(":picture", $picture, PDO::PARAM_STR);
+            $data->bindParam(":picture", $new_picture_path, PDO::PARAM_STR);
             $data->bindParam(":author_name", $author_name, PDO::PARAM_STR);
             $data->execute();
         } catch (PDOException $e) {
