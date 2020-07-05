@@ -1,7 +1,7 @@
 INSERT books (book_name, author_name, year, picture)
 VALUES ('СИ++ И КОМПЬЮТЕРНАЯ ГРАФИКА', 'Андрей Богуславский', '2020', '../../static/Images/22.jpg'),
        ('Программирование на языке Go!', 'Марк Саммерфильд', '2008', '../../static/Images/23.jpg'),
-       ('Толковый словарь сетевых терминов и аббревиатур', 'М., Вильямс', '1998', '../../static/Images/25.jpg'),
+       ('Толковый словарь сетевых терминов и аббревиатур', 'М. Вильямс', '1998', '../../static/Images/25.jpg'),
        ('Python for Data Analysis', 'Уэс Маккинни', '2020', '../../static/Images/26.jpg'),
        ('Thinking in Java (4th Edition)', 'Брюс Эккель', '1990', '../../static/Images/27.jpg'),
        ('Introduction to Algorithms', 'Томас Кормен, Чарльз Лейзерсон, Рональд Ривест, Клиффорд Штайн', '2020',
