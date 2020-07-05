@@ -23,22 +23,8 @@ create table if not exists `books`
     `number_of_clicks` INT(11) UNSIGNED DEFAULT 0,
     `is_active`        INT(1) UNSIGNED  DEFAULT 1
 )
-    #     `author_id`   BIGINT UNSIGNED NOT NULL,
-#         FOREIGN KEY (`author_id`) REFERENCES `authors` (`id`)
-#         ON DELETE RESTRICT ON UPDATE CASCADE
-
     engine = innodb
     character set utf8
     collate utf8_general_ci;
 
 
-# -- Table authors --
-# create table if not exists `authors`
-# (
-#     `id`          serial       not null,
-#     `author_name` varchar(255) not null,
-#     `author_last_name`        varchar(255) not null
-# )
-#     engine = innodb
-#     character set utf8
-#     collate utf8_general_ci;
