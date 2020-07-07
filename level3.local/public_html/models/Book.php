@@ -1,5 +1,5 @@
 <?php
-require_once '/home/nancy/www/level3.local/public_html/config/connect_bd.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . 'public_html/config/connect_bd.php';
 
 class Book
 {
@@ -13,20 +13,22 @@ class Book
     {
         $book_as_array = array();
         $db_connect = ConnectBD::connectDB();
-        $query = sprintf('select * from books where id = ?');
+        $query = sprintf(" SELECT `b`.`id`, `b`.`book_name`, `b`.`year`, `b`.`picture`, GROUP_CONCAT(`a`.`author_name` SEPARATOR ', ') 
+            AS `author`
+            FROM `books` AS `b`
+            LEFT JOIN `pairs` AS `ab` ON `ab`.`id_books` = `b`.`id`
+            LEFT JOIN `authors`AS `a` ON `a`.`id` = `ab`.`id_authors`
+            WHERE `b`.`id` = ?
+        
+        ");
+        // $query = sprintf('select * from books where id = ?');
         $statement = $db_connect->prepare($query);
         $statement->bindValue(1, $id, PDO::PARAM_INT);
         $statement->execute();
 
         $row = $statement->fetch();
 
-        $book_as_array['id'] = $row['id'];
-        $book_as_array['book_name'] = $row['book_name'];
-        $book_as_array['year'] = $row['year'];
-        $book_as_array['picture'] = $row['picture'];
-        $book_as_array['author_name'] = $row['author_name'];
-
-        return $book_as_array;
+        return $row;
     }
 
     /**
@@ -37,34 +39,30 @@ class Book
     public static function getBooksList($shift)
     {
         $db_connect = ConnectBD::connectDB();
+        $query = "SELECT books.id, books.book_name, books.year, books.picture, books.number_of_clicks, 
+                   GROUP_CONCAT(authors.author_name SEPARATOR ', ') 
+            AS author
+            FROM books 
+            LEFT JOIN pairs  
+            ON pairs.id_books = books.id
+            LEFT JOIN authors
+            ON authors.id = pairs.id_authors
+            WHERE books.is_active = 1
+            GROUP BY books.id
+            LIMIT ?, ?";
+
         // запрос на получение общего количества книг
-        $query = "SELECT * FROM books WHERE is_active = 1";
-        $statement = $db_connect->prepare($query);
-        $statement->execute();
-        $count = $statement->rowCount();
-
-
-        $books_list = array();
-        // получем первые?? 20 книг
-        $query = sprintf('select * from books where is_active = 1 limit ?,?');
         $statement = $db_connect->prepare($query);
         $statement->bindValue(1, 10 * $shift, PDO::PARAM_INT);
         $statement->bindValue(2, 10, PDO::PARAM_INT);
         $statement->execute();
+        $count = $statement->rowCount();
 
-        // нужно их переложить в массив поудобнее
-        for ($i = 0; $row = $statement->fetch(); $i++) {
-            $books_list[$i]['id'] = $row['id'];
-            $books_list[$i]['book_name'] = $row['book_name'];
-            $books_list[$i]['year'] = $row['year'];
-            $books_list[$i]['picture'] = $row['picture'];
-            $books_list[$i]['author_name'] = $row['author_name'];
-            $books_list[$i]['number_of_clicks'] = $row['number_of_clicks'];
-            $books_list[$i]['shift'] = $shift;
-            $books_list[$i]['count'] = $count;
+        $row = $statement->fetchAll(PDO::FETCH_ASSOC);
+        $row ['shift'] = $shift;
+        $row ['count'] = $count;
+        return $row;
 
-        }
-        return $books_list;
     }
 
     /**
@@ -79,19 +77,46 @@ class Book
             $new_picture_path = "../../static/Images/" . $array_from_post_request['uploadedPicture'];
             move_uploaded_file("../../static/PreFiles/" . $array_from_post_request['uploadedPicture'], $new_picture_path);
 
-            $db_connect = ConnectBD::connectDB();
-            $query = 'INSERT INTO books (book_name, year, picture, author_name) VALUES (:book_name, :year, :picture, :author_name)';
-
             $book_name = $array_from_post_request['book_name'];
             $year = $array_from_post_request['year'];
-            $author_name = $array_from_post_request['author_1'];
+            $authors = array();
+            array_push($authors, $array_from_post_request['author_1']);
+            array_push($authors, $array_from_post_request['author_2']);
+            array_push($authors, $array_from_post_request['author_3']);
+
+            var_dump($authors);
+
+            $db_connect = ConnectBD::connectDB();
+            $query = 'INSERT INTO books (book_name, year, picture) VALUES (:book_name, :year, :picture)';
 
             $data = $db_connect->prepare($query);
             $data->bindParam(":book_name", $book_name, PDO::PARAM_STR);
             $data->bindParam(":year", $year, PDO::PARAM_INT);
             $data->bindParam(":picture", $new_picture_path, PDO::PARAM_STR);
-            $data->bindParam(":author_name", $author_name, PDO::PARAM_STR);
+
             $data->execute();
+            // получать id  последней вставки
+            $bookId = $db_connect->lastInsertId();
+
+            foreach ($authors as $key => $author) {
+
+                if (strlen($author) == 0) {
+                    continue;
+                }
+                $query = 'INSERT INTO authors (author_name) VALUES (:author_name)';
+                $data = $db_connect->prepare($query);
+                $data->bindParam(":author_name", $author, PDO::PARAM_STR);
+                $data->execute();
+                $authorId = $db_connect->lastInsertId();
+
+                $query = 'INSERT INTO pairs (id_books, id_authors) VALUES (:book_name, :author_name)';
+                $data = $db_connect->prepare($query);
+                $data->execute([
+                    'book_name' => $bookId,
+                    'author_name' => $authorId
+                ]);
+            }
+
         } catch (PDOException $e) {
             echo json_encode(array("error" => $e->getMessage()));
         }
