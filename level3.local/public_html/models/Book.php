@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER["DOCUMENT_ROOT"] . 'public_html/config/connect_bd.php';
+require_once $_SERVER["DOCUMENT_ROOT"] . '/config/connect_bd.php';
 
 class Book
 {
