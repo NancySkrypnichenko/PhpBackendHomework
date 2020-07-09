@@ -17,7 +17,7 @@ class AdmController
             }
         }
         $booksList = Book::getBooksList($shift);
-        include_once ROOT . '/views/Admin/form.php';
+        include_once ROOT . '/views/adminForm.php';
     }
 
     public function actionSaveFile()
