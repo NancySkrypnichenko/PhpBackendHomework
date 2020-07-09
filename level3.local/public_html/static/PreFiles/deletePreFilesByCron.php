@@ -2,10 +2,16 @@
 
 $sqlFolder = str_replace('\\', '/', realpath(dirname(__FILE__)) . '/');
 // Получаем список всех sql-файлов
+// Находим папку с картинками
+$sqlFolder = str_replace('\\', '/', realpath(dirname(__FILE__)) . '/');
+// Получаем список всех файлов
 
-foreach (glob("*") as $filename) {
-    if (substr($filename, -4) == ".php") {
+foreach (glob($sqlFolder . '*.*') as $filename) {
+    echo $filename;
+
+    if (substr($filename, -4) == ".php") {//should leave it here
         continue;
     }
-    uniqid($filename);
+
+    unlink($filename);
 }
