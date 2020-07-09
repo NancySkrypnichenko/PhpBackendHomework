@@ -14,10 +14,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="library Sh++">
-    <link rel="stylesheet" href="../../static/CSS/libs.min.css">
-    <link rel="stylesheet" href="../../static/CSS/style.css">
+    <link rel="stylesheet" href="../static/CSS/libs.min.css">
+    <link rel="stylesheet" href="../static/CSS/style.css">
 
-    <script type="text/javascript" src="../../static/JS/loadFile.js"></script>
+    <script type="text/javascript" src="../static/JS/loadFile.js"></script>
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"
@@ -72,13 +72,7 @@
                         url: '/adm/form',
                         type: 'GET',
                         headers: {"Authorization": "Basic xxx"},
-                        /*beforeSend: function(xhr)
-                        {
-                            xhr.setRequestHeader("Authorization", "Basic AAAAAAAAAAAAAAAAAAA=");
-                        },*/
-
                         error: function (err) {
-                            //alert(window.location.protocol + '//xxxx:xxxx@' + window.location.host + ':' + window.location.port + LogOffPage);
                             window.location = window.location.protocol + '//xxxx:xxxx@' + window.location.host + LogOffPage;
                             window.location = window.location.protocol + '//' + window.location.host + LogOffPage;
                         }
@@ -110,11 +104,14 @@
                 <tbody>
                 <?php $i = 0;
                 foreach ($booksList as $bookItem) :
+                    if (!isset($bookItem['id'])) {
+                        continue;
+                    }
                     ?>
                     <tr>
                         <th scope="row"><?php echo ++$i ?></th>
                         <td><?php echo $bookItem['book_name'] ?></td>
-                        <td><?php echo $bookItem['author_name'] ?></td>
+                        <td><?php echo $bookItem['author'] ?></td>
                         <td><?php echo $bookItem['year'] ?></td>
 
 
@@ -138,7 +135,7 @@
                 <nav aria-label="...">
                     <ul class="pagination pagination-sm">
 
-                        <?php for ($i = 0; $i < (int)($booksList[0]['count'] / OFFSET) + 1; $i++) { ?>
+                        <?php for ($i = 0; $i < (int)($booksList['count'] / OFFSET) + 1; $i++) { ?>
                             <li>
                                 <a class="page-link" href="http://level3.local/adm/form/<?php echo $i ?>"
                                    tabindex="-1"><?php echo $i + 1 ?></a>
