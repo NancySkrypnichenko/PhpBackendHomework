@@ -14,8 +14,10 @@ create table if not exists `pairs`
     `id_books`   bigint unsigned,
     `id_authors` bigint unsigned,
 
-    FOREIGN KEY (id_books) REFERENCES books (id),
+    FOREIGN KEY (id_books) REFERENCES books (id)
+        on delete set null,
     FOREIGN KEY (id_authors) REFERENCES authors (id)
+        on delete set null
 )
     engine = innodb
     character set utf8
