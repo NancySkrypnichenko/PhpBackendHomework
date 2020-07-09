@@ -36,12 +36,14 @@ class Router
                 $internalRoute = preg_replace("~^$uriPattern~", $path, $uri);
 
                 $segments = explode('/', $internalRoute);
+                // echo " segments = ".$segments;
 
                 $controllerName = ucfirst(array_shift($segments) . 'Controller');
 
                 $actionName = 'action' . ucfirst(array_shift($segments));
 
                 $parameters = $segments;
+
 
                 // include file of controller
                 $controllerFile = ROOT . '/controllers/' . $controllerName . '.php';
