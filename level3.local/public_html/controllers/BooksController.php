@@ -10,7 +10,7 @@ class BooksController
     {
 
         $booksList = Book::getBooksList($shift);
-        include_once ROOT . '/views/books/index.php';
+        include_once ROOT . '/views/booksList.php';
         return true;
     }
 
@@ -18,7 +18,7 @@ class BooksController
     {
         if ($id) {
             $book = Book::getBookById($id);
-            include_once ROOT . '/views/OneBook/index.php';
+            include_once ROOT . '/views/bookItem.php';
         }
 
         return true;
@@ -33,7 +33,7 @@ class BooksController
     {
 
         $booksList = Book::search($string);
-        include_once ROOT . '/views/books/index.php';
+        include_once ROOT . '/views/booksList.php';
         return true;
     }
 }
